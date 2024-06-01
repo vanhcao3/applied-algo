@@ -38,7 +38,6 @@ void update_best() {
     if (curr + c[x[2 * n]][x[0]] < best) {
         best = curr + c[x[2 * n]][x[0]];
         best_route = current_route;
-        best_route.push_back(x[0]); 
     }
 }
 
@@ -85,14 +84,11 @@ void solve() {
 
     x[0] = 0;
     visited[0] = true;
-    current_route.push_back(0);
     Try(1);
-    cout << endl;
+    cout << n << endl;
     for(const auto &itr: best_route){
 		cout << itr << " ";
 	}
-	cout << endl;
-    cout << best << endl;
 }
 
 int main() {

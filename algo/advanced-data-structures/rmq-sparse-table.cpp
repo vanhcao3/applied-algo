@@ -12,8 +12,8 @@ const ll MOD = 1e9 + 7;
 const ll INF = 1e9;
 const ld EPS = 1e-9;
 
-int n, a[1000], q;
-int lookup[1000][1000];
+int n, a[1000001], q;
+int lookup[1000001][20];
 
 void preprocess(){
 	for(int i=0; i<n; i++){
@@ -32,17 +32,19 @@ void preprocess(){
 }
 
 void query(){
+	int sum = 0;
 	cin >> q;
 	for(int k=0; k<q; k++){
 		int L, R;
 		cin >> L >> R;
 		int j = floor(log2(R-L+1));
 		if(a[lookup[L][j]] < a[lookup[R-(1<<j)+1][j]]){
-			cout << a[lookup[L][j]] << endl; 
+			sum += a[lookup[L][j]]; 
 		} else {
-			cout << a[lookup[R-(1<<j)+1][j]] << endl;
+			sum += a[lookup[R-(1<<j)+1][j]];
 		}
 	}
+	cout << sum;
 }
 
 void solve() {
