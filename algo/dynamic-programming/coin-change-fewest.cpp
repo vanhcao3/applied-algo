@@ -43,7 +43,7 @@ void solve() {
 		
 	memset(dp, -1, sizeof(dp));
 		
-	cout << min_coin(n, sum);	
+	cout << min_coin(n, sum);
 }
 
 int main() {
