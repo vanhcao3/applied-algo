@@ -1,21 +1,26 @@
 #include <iostream>
 #include <vector>
+#include <algorithm>
 using namespace std;
 
-int lcs(vector<int>& X, vector<int>& Y) {
+int longestCommonSubsequence(vector<int>& X, vector<int>& Y) {
     int n = X.size(), m = Y.size();
-    vector<vector<int>> dp(n + 1, vector<int>(m + 1, 0));
-    
+    vector<int> dp(m + 1, 0);
+    int prev;
+
     for (int i = 1; i <= n; ++i) {
+        prev = 0;
         for (int j = 1; j <= m; ++j) {
+            int temp = dp[j];
             if (X[i - 1] == Y[j - 1])
-                dp[i][j] = dp[i - 1][j - 1] + 1;
+                dp[j] = prev + 1;
             else
-                dp[i][j] = max(dp[i - 1][j], dp[i][j - 1]);
+                dp[j] = max(dp[j], dp[j - 1]);
+            prev = temp;
         }
     }
     
-    return dp[n][m];
+    return dp[m];
 }
 
 int main() {
@@ -28,9 +33,8 @@ int main() {
     for (int i = 0; i < m; ++i)
         cin >> Y[i];
 
-    int result = lcs(X, Y);
+    int result = longestCommonSubsequence(X, Y);
     cout << result << endl;
 
     return 0;
 }
-
