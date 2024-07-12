@@ -1,70 +1,64 @@
-#include <iostream>
-#include <vector>
-#include <algorithm>
-#include <cstring>
-
+#include <bits/stdc++.h>
 using namespace std;
 
-struct Edge
-{
-    int v, w;
-};
+const int MAXN = 100005;
+vector<pair<int, int>> adj[MAXN]; // Adjacency list: node -> (neighbor, weight)
+int p[MAXN], N[MAXN];
+long long d[MAXN], f[MAXN];
+int n;
 
-vector<vector<Edge>> adj;
-vector<int> subtree_size;
-vector<long long> distance_sum;
-vector<long long> max_f;
-
-void DFS1(int u, int parent, int depth)
+void DFS1(int u)
 {
-    subtree_size[u] = 1;
-    for (const Edge &edge : adj[u])
+    for (auto &edge : adj[u])
     {
-        if (edge.v != parent)
+        int v = edge.first, w = edge.second;
+        if (p[v] == 0)
         {
-            DFS1(edge.v, u, depth + edge.w);
-            subtree_size[u] += subtree_size[edge.v];
-            distance_sum[u] += distance_sum[edge.v] + edge.w * subtree_size[edge.v];
+            p[v] = u;
+            DFS1(v);
+            d[u] += d[v] + N[v] * w;
+            N[u] += N[v];
         }
     }
 }
 
-void DFS2(int u, int parent)
+void Phase1()
 {
-    if (parent != -1)
+    fill(p, p + n + 1, 0);
+    fill(d, d + n + 1, 0);
+    fill(N, N + n + 1, 1);
+    fill(f, f + n + 1, 0);
+    p[1] = 1;
+    DFS1(1);
+}
+
+void DFS2(int u)
+{
+    for (auto &edge : adj[u])
     {
-        // Correct calculation of distance_sum[u] considering the entire tree
-        distance_sum[u] = distance_sum[parent] + (subtree_size[0] - subtree_size[u] * 2);
-        for (const Edge &edge : adj[u])
+        int v = edge.first, w = edge.second;
+        if (p[v] == 0)
         {
-            if (edge.v == parent)
-            {
-                distance_sum[u] += edge.w * (subtree_size[0] - subtree_size[u]);
-                break;
-            }
+            long long F = f[u] - (d[v] + N[v] * w);
+            f[v] = F + d[v] + w * (n - N[v]);
+            p[v] = u;
+            DFS2(v);
         }
     }
-    max_f[u] = max(max_f[u], distance_sum[u]);
-    for (const Edge &edge : adj[u])
-    {
-        if (edge.v != parent)
-        {
-            DFS2(edge.v, u);
-        }
-    }
+}
+
+void Phase2()
+{
+    fill(p, p + n + 1, 0);
+    f[1] = d[1];
+    p[1] = 1;
+    DFS2(1);
 }
 
 int main()
 {
-    int n;
     cin >> n;
-
-    adj.resize(n + 1);
-    subtree_size.resize(n + 1, 0);
-    distance_sum.resize(n + 1, 0);
-    max_f.resize(n + 1, 0);
-
-    for (int i = 0; i < n - 1; ++i)
+    for (int i = 1; i < n; ++i)
     {
         int u, v, w;
         cin >> u >> v >> w;
@@ -72,10 +66,9 @@ int main()
         adj[v].push_back({u, w});
     }
 
-    DFS1(1, -1, 0);
-    DFS2(1, -1);
+    Phase1();
+    Phase2();
 
-    cout << *max_element(max_f.begin() + 1, max_f.end()) << endl;
-
+    cout << *max_element(f + 1, f + n + 1) << endl;
     return 0;
 }

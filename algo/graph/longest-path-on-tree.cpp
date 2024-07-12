@@ -1,64 +1,33 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-const int MAXN = 100005;
-vector<pair<int, int>> adj[MAXN]; // Adjacency list: node -> (neighbor, weight)
-int p[MAXN], N[MAXN];
-long long d[MAXN], f[MAXN];
-int n;
+vector<pair<int, int>> adj[100005]; // Adjacency list: node -> (neighbor, weight)
 
-void DFS1(int u)
+// DFS function to find the farthest node and its distance from the start node
+pair<int, int> dfs(int node, int parent)
 {
-    for (auto &edge : adj[u])
+    pair<int, int> maxDist = {0, node}; // (distance, node)
+    for (auto &edge : adj[node])
     {
-        int v = edge.first, w = edge.second;
-        if (p[v] == 0)
+        int next = edge.first, weight = edge.second;
+        if (next != parent)
         {
-            p[v] = u;
-            DFS1(v);
-            d[u] += d[v] + N[v] * w;
-            N[u] += N[v];
+            pair<int, int> dist = dfs(next, node);
+            dist.first += weight; // Add the weight of the current edge
+            if (dist.first > maxDist.first)
+            {
+                maxDist = dist;
+            }
         }
     }
-}
-
-void Phase1()
-{
-    fill(p, p + n + 1, 0);
-    fill(d, d + n + 1, 0);
-    fill(N, N + n + 1, 1);
-    fill(f, f + n + 1, 0);
-    p[1] = 1;
-    DFS1(1);
-}
-
-void DFS2(int u)
-{
-    for (auto &edge : adj[u])
-    {
-        int v = edge.first, w = edge.second;
-        if (p[v] == 0)
-        {
-            long long F = f[u] - (d[v] + N[v] * w);
-            f[v] = F + d[v] + w * (n - N[v]);
-            p[v] = u;
-            DFS2(v);
-        }
-    }
-}
-
-void Phase2()
-{
-    fill(p, p + n + 1, 0);
-    f[1] = d[1];
-    p[1] = 1;
-    DFS2(1);
+    return maxDist;
 }
 
 int main()
 {
-    cin >> n;
-    for (int i = 1; i < n; ++i)
+    int N;
+    cin >> N;
+    for (int i = 1; i < N; ++i)
     {
         int u, v, w;
         cin >> u >> v >> w;
@@ -66,9 +35,12 @@ int main()
         adj[v].push_back({u, w});
     }
 
-    Phase1();
-    Phase2();
+    // First DFS to find the farthest node from an arbitrary node (e.g., 1)
+    pair<int, int> farthest = dfs(1, -1);
 
-    cout << *max_element(f + 1, f + n + 1) << endl;
+    // Second DFS from the farthest node found in the first DFS
+    pair<int, int> diameter = dfs(farthest.second, -1);
+
+    cout << diameter.first << endl; // Output the diameter of the tree
     return 0;
 }

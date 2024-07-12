@@ -4,11 +4,13 @@
 
 using namespace std;
 
-const int N = 11; // Number of vertices
 int num[N], low[N], parent[N], counter = 0;
 bool isAP[N]; // Articulation points
+
+const int N = 11; // Number of vertices
 vector<pair<int, int>> edgeList = {
     {0, 1}, {0, 2}, {1, 2}, {2, 3}, {3, 5}, {3, 8}, {4, 5}, {4, 7}, {4, 10}, {5, 6}, {5, 8}, {6, 8}, {6, 9}, {7, 10}};
+
 vector<vector<int>> adj(N);
 
 void createAdjList()
